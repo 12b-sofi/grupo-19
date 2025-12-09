@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import plotly.express as px
 # Importar funciones de gráficos actualizadas
 from graficos_udec import (
     crear_grafico_lineas, crear_grafico_barras_apiladas, crear_grafico_barras_agrupadas,
