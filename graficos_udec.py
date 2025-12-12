@@ -1,37 +1,28 @@
 import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
-# ==========================================
-# COLORES UdeC
-# ==========================================
 colores_udec = {
     'azul': '#003DA5',
     'amarillo': '#e69b0a',
     'gris': '#a0a0a0',
     'rojo': '#d21428',
-    'mujer': '#E91E63',           # Rosa intenso
-    'hombre': '#1976D2',          # Azul
+    'mujer': '#E91E63',          
+    'hombre': '#1976D2',        
     'mujer_claro': '#F8BBD0',
     'mujer_medio': '#F06292',
     'mujer_oscuro': '#C2185B',
     'hombre_claro': '#BBDEFB',
     'hombre_medio': '#64B5F6',
     'hombre_oscuro': '#1565C0',
-    'brecha': '#FF9800',          # Naranja
-    'verde': '#66BB6A',           # Riesgo Bajo
-    'amarillo_riesgo': '#FFA726', # Riesgo Medio
-    'rojo_riesgo': '#EF5350'      # Riesgo Alto
+    'brecha': '#FF9800',          
+    'verde': '#66BB6A',           
+    'amarillo_riesgo': '#FFA726', 
+    'rojo_riesgo': '#EF5350'    
 }
 
-# ==========================================
-# GRÁFICOS DE LÍNEAS (EVOLUCIÓN)
-# ==========================================
 
 def crear_grafico_lineas(datos, col_x, cols_y, titulo, etiq_y):
-    """
-    Crea gráfico de líneas moderno estilo UdeC
-    Similar al gráfico de Análisis Histórico
-    """
+ 
     # Filtrar datos para eliminar años sin información
     datos_filtrados = datos.copy()
     # Eliminar filas donde todas las columnas Y son 0 o NaN
@@ -44,7 +35,6 @@ def crear_grafico_lineas(datos, col_x, cols_y, titulo, etiq_y):
     fig = go.Figure()
     
     for col in cols_y:
-        # Determinar nombre y color
         if col.endswith('_M') or 'mujeres' in col.lower() or col in ['puntaje_M', 'ingresos_M', 'titulaciones_M']:
             nombre = 'Mujeres'
             color = colores_udec['mujer']
@@ -58,8 +48,7 @@ def crear_grafico_lineas(datos, col_x, cols_y, titulo, etiq_y):
             mode='lines+markers',
             name=nombre,
             line=dict(color=color, width=3),
-            marker=dict(size=8, color='white', line=dict(width=2, color=color))
-        ))
+            marker=dict(size=8, color='white', line=dict(width=2, color=color)) ))
     
     fig.update_layout(
         title=f"<b>{titulo}</b>",
@@ -83,15 +72,9 @@ def crear_grafico_lineas(datos, col_x, cols_y, titulo, etiq_y):
     
     return fig
 
-# ==========================================
-# GRÁFICOS DE BARRAS HORIZONTALES (DISTRIBUCIÓN)
-# ==========================================
 
 def crear_grafico_barras_apiladas(datos, col_x, cols_y, titulo):
-    """
-    Crea gráfico de barras horizontales apiladas
-    Similar al gráfico de Distribución de Puntajes
-    """
+  
     # Filtrar datos para eliminar años sin información
     datos_filtrados = datos.copy()
     mask = datos_filtrados[cols_y].sum(axis=1) > 0
@@ -99,8 +82,7 @@ def crear_grafico_barras_apiladas(datos, col_x, cols_y, titulo):
     
     if datos_filtrados.empty:
         return None
-    
-    # Ordenar datos por año descendente para visualización
+
     datos_sorted = datos_filtrados.sort_values(col_x, ascending=False).copy()
     
     fig = go.Figure()
@@ -137,16 +119,10 @@ def crear_grafico_barras_apiladas(datos, col_x, cols_y, titulo):
     
     return fig
 
-# ==========================================
-# GRÁFICO DE BRECHA
-# ==========================================
+
 
 def crear_grafico_brecha(datos, col_brecha, titulo):
-    """
-    Crea gráfico de línea para mostrar brechas de género
-    Similar al gráfico de Brecha de Género
-    """
-    # Filtrar datos para eliminar años sin información
+  
     datos_filtrados = datos[datos[col_brecha].notna()].copy()
     
     if datos_filtrados.empty:
@@ -191,16 +167,9 @@ def crear_grafico_brecha(datos, col_brecha, titulo):
     
     return fig
 
-# ==========================================
-# GRÁFICOS DE DONA
-# ==========================================
 
 def crear_grafico_dona(valores, etiquetas, titulo, genero=None):
-    """
-    Crea gráfico de dona moderno
-    Similar a los gráficos de Distribución de Riesgo
-    """
-    # paleta de colores según el género
+
     if genero == 'mujer':
         colores = [colores_udec['mujer_claro'], colores_udec['mujer_medio'], colores_udec['mujer_oscuro']]
     elif genero == 'hombre':
@@ -235,18 +204,10 @@ def crear_grafico_dona(valores, etiquetas, titulo, genero=None):
     
     return fig
 
-# ==========================================
-# GRÁFICO RADAR
-# ==========================================
+
 
 def crear_grafico_radar(vals, titulo, modo='comparacion'):
-    """
-    Crea gráfico de radar para análisis psicosocial
-    Similar al Perfil Psicosocial por nivel de riesgo
-    
-    vals: dict con estructura {Factor: {'Mujeres': val, 'Hombres': val}}
-    modo: 'comparacion', 'mujeres', 'hombres'
-    """
+  
     categorias = list(vals.keys())
     
     fig = go.Figure()
@@ -297,15 +258,9 @@ def crear_grafico_radar(vals, titulo, modo='comparacion'):
     
     return fig
 
-# ==========================================
-# GRÁFICO DE BARRAS HORIZONTALES
-# ==========================================
 
 def crear_grafico_barras_horizontales(vals, titulo):
-    """
-    Crea gráfico de barras horizontales agrupadas
-    Para comparación de factores
-    """
+ 
     categorias = list(vals.keys())
     
     if not categorias or 'Mujeres' not in vals.get(categorias[0], {}):
@@ -348,15 +303,9 @@ def crear_grafico_barras_horizontales(vals, titulo):
     
     return fig
 
-# ==========================================
-# GRÁFICO DE BARRAS AGRUPADAS
-# ==========================================
 
 def crear_grafico_barras_agrupadas(datos, col_x, cols_y, titulo, etiq_y):
-    """
-    Crea gráfico de barras verticales agrupadas
-    Para comparaciones por año
-    """
+
     # Filtrar datos para eliminar años sin información
     datos_filtrados = datos.copy()
     mask = datos_filtrados[cols_y].sum(axis=1) > 0
