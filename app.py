@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Importar funciones de gráficos actualizadas
+
 from graficos_udec import (
     crear_grafico_lineas, crear_grafico_barras_apiladas, crear_grafico_barras_agrupadas,
     crear_grafico_dona, crear_grafico_radar, crear_grafico_barras_horizontales, 
@@ -11,7 +11,6 @@ from graficos_udec import (
 # Configuración de la página
 st.set_page_config(page_title="Análisis de Brechas de Género - UdeC", page_icon="📊", layout="wide")
 
-# Aplicar estilos CSS de UdeC
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap');
@@ -33,7 +32,6 @@ def verificar_credenciales(usuario, contraseña):
     return False
 
 def obtener_rol_usuario(usuario):
-    """Obtiene el rol del usuario (admin o carrera específica)"""
     try:
         return st.secrets["roles"].get(usuario, None)
     except Exception:
@@ -72,7 +70,6 @@ def pagina_login():
 
 @st.cache_data
 def cargar_datos():
-    """Carga el archivo base maestra con todos los datos procesados"""
     try:
         return pd.read_csv('data/base_maestra.csv')
     except FileNotFoundError:
@@ -80,7 +77,6 @@ def cargar_datos():
         return None
 
 def mostrar_card_reprobaciones(titulo, promedio, minimo, maximo):
-    """Muestra una tarjeta con estadísticas de reprobaciones"""
     st.markdown(f"""
     <div style='background-color: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid {colores_udec['azul']};'>
         <h4 style='margin-top: 0; color: {colores_udec['azul']};'>{titulo}</h4>
@@ -91,42 +87,37 @@ def mostrar_card_reprobaciones(titulo, promedio, minimo, maximo):
     """, unsafe_allow_html=True)
 
 def seccion_ingreso(datos_filtrados):
-    """Sección 1: Análisis de Ingresos - LAYOUT VERTICAL"""
     st.header("Análisis de Ingresos")
     tabs = st.tabs(["Evolución", "Distribución", "Brechas"])
     
     with tabs[0]:
         st.subheader("Evolución Temporal de Ingresos")
         
-        # GRÁFICO 1: Cantidad de Ingresos (ARRIBA)
+    
         datos_ingresos_ev = datos_filtrados.groupby('año').agg({
             'ingresos_M':'sum', 
-            'ingresos_H':'sum'
-        }).reset_index()
+            'ingresos_H':'sum'  }).reset_index()
         
         grafico1 = crear_grafico_lineas(
             datos_ingresos_ev, 'año', 
             ['ingresos_M', 'ingresos_H'],
             'Cantidad de Ingresos por Año', 
-            'Cantidad de Estudiantes'
-        )
+            'Cantidad de Estudiantes'   )
         if grafico1:
             st.plotly_chart(grafico1, use_container_width=True)
         else:
             st.info("No hay datos de ingresos disponibles para mostrar")
         
-        # GRÁFICO 2: Puntajes Promedio (ABAJO)
+       
         datos_puntajes_ev = datos_filtrados.groupby('año').agg({
             'puntaje_M':'mean', 
-            'puntaje_H':'mean'
-        }).reset_index()
+            'puntaje_H':'mean'   }).reset_index()
         
         grafico2 = crear_grafico_lineas(
-            datos_puntajes_ev, 'año', 
+        datos_puntajes_ev, 'año', 
             ['puntaje_M', 'puntaje_H'],
             'Puntajes Promedio por Año', 
-            'Puntaje'
-        )
+            'Puntaje'  )
         if grafico2:
             st.plotly_chart(grafico2, use_container_width=True)
         else:
@@ -138,14 +129,12 @@ def seccion_ingreso(datos_filtrados):
         # GRÁFICO 1: Distribución de Ingresos (ARRIBA)
         datos_ingresos = datos_filtrados.groupby('año').agg({
             'ingresos_M':'sum', 
-            'ingresos_H':'sum'
-        }).reset_index()
+            'ingresos_H':'sum'  }).reset_index()
         
         grafico1 = crear_grafico_barras_apiladas(
             datos_ingresos, 'año', 
             ['ingresos_M', 'ingresos_H'],
-            'Distribución de Ingresos por Género'
-        )
+            'Distribución de Ingresos por Género'  )
         if grafico1:
             st.plotly_chart(grafico1, use_container_width=True)
         else:
@@ -154,15 +143,13 @@ def seccion_ingreso(datos_filtrados):
         # GRÁFICO 2: Comparación de Puntajes (ABAJO)
         datos_puntajes = datos_filtrados.groupby('año').agg({
             'puntaje_M':'mean', 
-            'puntaje_H':'mean'
-        }).reset_index()
+            'puntaje_H':'mean' }).reset_index()
         
         grafico2 = crear_grafico_barras_agrupadas(
             datos_puntajes, 'año', 
             ['puntaje_M', 'puntaje_H'],
             'Comparación de Puntajes Promedio por Género', 
-            'Puntaje Promedio'
-        )
+            'Puntaje Promedio' )
         if grafico2:
             st.plotly_chart(grafico2, use_container_width=True)
         else:
@@ -175,8 +162,7 @@ def seccion_ingreso(datos_filtrados):
         grafico1 = crear_grafico_brecha(
             datos_filtrados, 
             'brecha_ingresos', 
-            'Brecha de Ingresos (M - H)'
-        )
+            'Brecha de Ingresos (M - H)' )
         if grafico1:
             st.plotly_chart(grafico1, use_container_width=True)
         else:
@@ -186,37 +172,29 @@ def seccion_ingreso(datos_filtrados):
         grafico2 = crear_grafico_brecha(
             datos_filtrados, 
             'brecha_puntaje', 
-            'Brecha de Puntajes (M - H)'
-        )
+            'Brecha de Puntajes (M - H)' )
         if grafico2:
             st.plotly_chart(grafico2, use_container_width=True)
         else:
             st.info("No hay datos de brecha de puntajes disponibles")
 
 def seccion_riesgo(datos_filtrados):
-    """Sección 2: Análisis de Riesgo de Abandono - LAYOUT VERTICAL"""
     st.header("Análisis de Riesgo de Abandono")
-    
-    # Evolución temporal - VERTICAL
     st.subheader("Evolución Temporal del Riesgo")
     
-    # Riesgo Bajo
     grafico1 = crear_grafico_lineas(
         datos_filtrados, 'año', 
         ['riesgo_bajo_M', 'riesgo_bajo_H'],
         'Riesgo Bajo (%)', 
-        'Porcentaje'
-    )
+        'Porcentaje' )
     if grafico1:
         st.plotly_chart(grafico1, use_container_width=True)
     
-    # Riesgo Medio
     grafico2 = crear_grafico_lineas(
         datos_filtrados, 'año', 
         ['riesgo_medio_M', 'riesgo_medio_H'],
         'Riesgo Medio (%)', 
-        'Porcentaje'
-    )
+        'Porcentaje' )
     if grafico2:
         st.plotly_chart(grafico2, use_container_width=True)
     
@@ -229,14 +207,12 @@ def seccion_riesgo(datos_filtrados):
     )
     if grafico3:
         st.plotly_chart(grafico3, use_container_width=True)
-    
-    # Distribución general
+   
     st.subheader("Distribución General del Riesgo")
     promedio_bajo = datos_filtrados[['riesgo_bajo_M', 'riesgo_bajo_H']].mean().mean()
     promedio_medio = datos_filtrados[['riesgo_medio_M', 'riesgo_medio_H']].mean().mean()
     promedio_alto = datos_filtrados[['riesgo_alto_M', 'riesgo_alto_H']].mean().mean()
     
-    # Centrar el gráfico de dona
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         grafico = crear_grafico_dona(
@@ -246,7 +222,6 @@ def seccion_riesgo(datos_filtrados):
         )
         st.plotly_chart(grafico, use_container_width=True)
     
-    # Distribución por género - VERTICAL
     st.subheader("Distribución por Género")
     
     # Gráfico Mujeres (ARRIBA)
